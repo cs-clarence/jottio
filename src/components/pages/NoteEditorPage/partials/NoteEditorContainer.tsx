@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import NoteEditorForm from "./NoteEditorForm";
 import NoteEditorPreview from "./NoteEditorPreview";
 import NoteEditorTabBar from "./NoteEditorTabBar";
 import "./NoteEditorContainer.scss";
 import Split from "react-split";
+import { useAppSelector } from "../../../../store/hooks";
+import { selectNoteEditorActiveFile } from "../../../../store";
 
 type Props = {};
 
 function ComponentName(props: Props) {
-  const [title, setTitle] = useState("");
-  const [note, setNote] = useState("");
+  const activeFile = useAppSelector(selectNoteEditorActiveFile);
 
   return (
     <div className="w-full h-full flex flex-col flex-shrink">
@@ -25,14 +26,9 @@ function ComponentName(props: Props) {
         // cursor="col-resize"
         className="split"
       >
-        <NoteEditorForm
-          note={note}
-          title={title}
-          onNoteChange={setNote}
-          onTitleChange={setTitle}
-        />
+        <NoteEditorForm note={activeFile?.content} title={activeFile?.name} />
 
-        <NoteEditorPreview mdText={note} />
+        <NoteEditorPreview mdText={activeFile?.content} />
       </Split>
     </div>
   );

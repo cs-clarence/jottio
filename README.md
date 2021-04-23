@@ -7,6 +7,17 @@ Jottio - Note-Taking Web Application
 </h1>
 
 - Take notes using this web app.
+- Format your notes using Markdown.
+
+## Tools Used
+
+- NodeJS
+- Markdown-It
+- Lodash
+- ReactJS
+- Tailwind CSS
+- Sass
+- TypeScript
 
 ---
 

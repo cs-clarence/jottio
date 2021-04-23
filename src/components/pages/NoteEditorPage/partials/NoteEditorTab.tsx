@@ -3,13 +3,16 @@ import cn from "classnames";
 
 type Props = {
   active?: boolean;
-  onClick?: (ev: React.MouseEvent<HTMLDivElement, MouseEvent>) => {};
+  onClick?: (ev: Props["id"]) => void;
+  onClose?: (ev: Props["id"]) => void;
+  id: string | number;
+  name: string;
 };
 
 // keep track of the element being dragged
 let dragged: HTMLDivElement;
 
-function NoteEditorTab({ active, onClick }: Props) {
+function NoteEditorTab({ active, onClick, name, id, onClose }: Props) {
   const [aboutToDrop, setAboutToDrop] = useState(false);
   const thisDiv = useRef<HTMLDivElement>(null);
 
@@ -17,7 +20,7 @@ function NoteEditorTab({ active, onClick }: Props) {
     <div
       ref={thisDiv}
       className={cn(
-        `flex justify-center items-center px-2 bg-gray-700 overflow-hidden whitespace-nowrap relative`,
+        `flex justify-center items-center px-2 bg-gray-700 overflow-hidden whitespace-nowrap relative pr-6`,
         {
           "bg-gray-800 border-gray-900 border-t-2 border-l-2 border-r-2 opacity-75": !active,
           "border-t-2": active,
@@ -64,18 +67,16 @@ function NoteEditorTab({ active, onClick }: Props) {
         }
       }}
       onClick={(ev) => {
-        onClick?.(ev);
+        onClick?.(id);
       }}
       draggable
     >
-      Hello World
+      {name}
       <span
         className="fa fa-times pl-2 cursor-pointer absolute right-1 top-1/4 rounded-full"
         onClick={(ev) => {
-          (ev.nativeEvent
-            .target as HTMLSpanElement).parentElement?.parentElement?.removeChild(
-            thisDiv.current as Node
-          );
+          onClose?.(id);
+          ev.stopPropagation(); // stop propagation so parent onClick will not trigger
         }}
       ></span>
     </div>

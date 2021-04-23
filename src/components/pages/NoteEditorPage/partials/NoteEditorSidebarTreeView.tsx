@@ -1,44 +1,86 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  FileNode,
+  FolderNode,
+  isFileNode,
+  isTree,
+  noteEditorActions,
+} from "../../../../store";
+import { useAppDispatch } from "../../../../store/hooks";
+import cn from "classnames";
 
-export type Node = {
-  id: string | number;
-  name: string;
+export type Props = {
+  data: FolderNode;
+  level?: number;
+  onFileOpen?: (ev: FileNode) => void;
+  onFileCreate?: (ev: FileNode) => void;
+  onFolderCreate?: (ev: FolderNode) => void;
 };
-export type FileNode = Node & {
-  content: string;
-};
-export type Tree = Node & {
-  children: (Tree | FileNode | Node)[];
-};
-function isFileNode(x: FileNode | Node): x is FileNode {
-  return !!(x as FileNode).content;
-}
-
-function isTree(x: FileNode | Tree | Node): x is Tree {
-  return !!(x as Tree).children;
-}
-
-type Props = { data: Tree };
 
 // create recursive tree
-function NoteEditorSidebarTreeView({ data }: Props) {
+function NoteEditorSidebarTreeView({ data, level }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useAppDispatch();
+
   return (
-    <div>
-      {data.name}
-      {data.children.map((item, index) => {
-        return (
-          <div key={index}>
-            {item.name}
-            {isTree(item) && item.children.length > 0 && (
-              <ul>
-                {item.children.map((item, index) => {
-                  return <li key={index}>{item?.name}</li>;
-                })}
-              </ul>
-            )}
-          </div>
-        );
-      })}
+    <div className="select-none cursor-pointer">
+      <div
+        className={cn("", {
+          "bg-white bg-opacity-10 px-1 rounded-l-lg flex items-center": !isFileNode(
+            data
+          ),
+        })}
+        onClick={() => {
+          setIsOpen((prev) => !prev);
+        }}
+      >
+        <span
+          className={cn(
+            "fas fa-caret-right transform rotate-0 px-1 transition-transform",
+            {
+              "rotate-90": isOpen,
+            }
+          )}
+        ></span>
+        <span className="fas fa-folder px-1"></span>
+        <div className="flex-grow">{data.name}</div>
+        <span className="fas fa-folder-plus px-1"></span>
+        <span className="fas fa-file px-1"></span>
+        <span className="fas fa-trash px-1"></span>
+      </div>
+      <div className={cn("pl-4", { hidden: !isOpen })}>
+        {data.children.map((item) => {
+          return (
+            <React.Fragment key={item.id}>
+              {(isTree(item) && (
+                <NoteEditorSidebarTreeView
+                  data={item}
+                  level={level !== undefined ? level + 1 : 1}
+                />
+              )) ||
+                (isFileNode(item) && (
+                  <div
+                    onClick={() => {
+                      dispatch(
+                        noteEditorActions.openFile({
+                          id: item.id,
+                          content: item.content,
+                          name: item.name,
+                        })
+                      );
+                    }}
+                    className="flex px-1"
+                  >
+                    <span className="fas fa-circle px-1 transform scale-50"></span>
+                    <span className="fas fa-file px-1"></span>
+                    <div className="flex-grow">{item.name}</div>
+                    <span className="fas fa-trash px-1"></span>
+                  </div>
+                ))}
+            </React.Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 }
