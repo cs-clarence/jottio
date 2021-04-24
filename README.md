@@ -18,6 +18,7 @@ Jottio - Note-Taking Web Application
 - Tailwind CSS
 - Sass
 - TypeScript
+- Redux
 
 ---
 

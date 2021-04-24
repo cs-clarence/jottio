@@ -26,7 +26,7 @@ export function isFileNode(x: FileNode | Node): x is FileNode {
   return typeof (x as FileNode).content === "string" && isNode(x);
 }
 
-export function isTree(x: FileNode | FolderNode | Node): x is FolderNode {
+export function isFolderNode(x: FileNode | FolderNode | Node): x is FolderNode {
   return (x as FolderNode).children instanceof Array && isNode(x);
 }
 
@@ -80,12 +80,21 @@ export const fileTreeSlice = createSlice({
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    editNodeName(state, action: { payload: Node }) {
-      
+    renameNode(state, action: { payload: Node }) {
+      let foundNode = false;
+      const nodeStack: (Node | FileNode | FolderNode)[] = [state.value];
+
       if (state.value && state.value.children) {
-        for (const item of state.value.children) {
-          if (item.id === action.payload.id) {
-            item.name = action.payload.name;
+        while (!foundNode && !(nodeStack.length < 1)) {
+          const got = nodeStack.pop();
+          if (got) {
+            if (got.id === action.payload.id) {
+              got.name = action.payload.name;
+              break;
+            }
+            if (isFolderNode(got)) {
+              nodeStack.push(...got.children);
+            }
           }
         }
       }

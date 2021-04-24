@@ -1,96 +1,119 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FileNode,
   FolderNode,
   isFileNode,
-  isTree,
+  isFolderNode,
   noteEditorActions,
+  fileTreeActions,
 } from "../../../../store";
 import { useAppDispatch } from "../../../../store/hooks";
 import cn from "classnames";
 
 export type Props = {
-  data: FolderNode;
-  level?: number;
+  data: FolderNode | FileNode;
+  renamingID?: string | number;
+  onRenaming?: (id: string | number) => void;
   onFileOpen?: (ev: FileNode) => void;
   onFileCreate?: (ev: FileNode) => void;
   onFolderCreate?: (ev: FolderNode) => void;
 };
-
 // create recursive tree
-function NoteEditorSidebarTreeView({ data, level }: Props) {
+function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState(data.name);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    setName(data.name);
+  }, [renamingID, data.name]);
 
   return (
     <div className="select-none cursor-pointer">
       <div
-        className={cn("", {
-          "bg-white bg-opacity-10 px-1 rounded-l-lg flex items-center": !isFileNode(
-            data
-          ),
+        className={cn("flex items-center px-1", {
+          "bg-white bg-opacity-10 rounded-l-lg": !isFileNode(data),
         })}
         onClick={() => {
-          setIsOpen((prev) => !prev);
+          if (isFileNode(data)) {
+            dispatch(
+              noteEditorActions.openFile({
+                id: data.id,
+                content: data.content,
+                name: data.name,
+              })
+            );
+          } else {
+            setIsOpen((prev) => !prev);
+          }
         }}
       >
-        <span
-          className={cn(
-            "fas fa-caret-right transform rotate-0 px-1 transition-transform",
-            {
-              "rotate-90": isOpen,
-            }
-          )}
-        ></span>
-        <span className="fas fa-folder px-1"></span>
+        {(isFileNode(data) && (
+          <>
+            <span className="fas fa-circle px-1 transform scale-50"></span>
+            <span className="fas fa-file px-1"></span>
+          </>
+        )) || (
+          <>
+            <span
+              className={cn(
+                "fas fa-caret-right transform rotate-0 px-1 transition-transform",
+                {
+                  "rotate-90": isOpen,
+                }
+              )}
+            ></span>
+            <span className="fas fa-folder px-1"></span>
+          </>
+        )}
         <div className="flex-grow">
           <span
-            className="hover:underline cursor-text"
-            onClick={(ev) => ev.stopPropagation()}
+            className="hover:underline cursor-text relative"
+            onClick={(ev) => {
+              onRenaming?.(data.id);
+              ev.stopPropagation();
+            }}
           >
             {data.name}
+            {renamingID === data.id && (
+              <input
+                className="text-black absolute w-full h-full left-0 top-0"
+                type="text"
+                value={name}
+                onChange={(ev) => setName(ev.target.value)}
+                onKeyDown={(ev) => {
+                  if (ev.key === "Enter") {
+                    dispatch(fileTreeActions.renameNode({ id: data.id, name }));
+                    onRenaming?.("");
+                  }
+                }}
+              />
+            )}
           </span>
         </div>
-        <span className="fas fa-folder-plus px-1"></span>
-        <span className="fas fa-file px-1"></span>
+
+        {!isFileNode(data) && (
+          <>
+            <span className="fas fa-folder-plus px-1"></span>
+            <span className="fas fa-file px-1"></span>
+          </>
+        )}
+
         <span className="fas fa-trash px-1"></span>
       </div>
+
       <div className={cn("pl-4", { hidden: !isOpen })}>
-        {data.children.map((item) => {
-          return (
-            <React.Fragment key={item.id}>
-              {(isTree(item) && (
-                <NoteEditorSidebarTreeView data={item} level={level ?? 2} />
-              )) ||
-                (isFileNode(item) && (
-                  <div
-                    onClick={() => {
-                      dispatch(
-                        noteEditorActions.openFile({
-                          id: item.id,
-                          content: item.content,
-                          name: item.name,
-                        })
-                      );
-                    }}
-                    className="flex px-1"
-                  >
-                    <span className="fas fa-circle px-1 transform scale-50"></span>
-                    <span className="fas fa-file px-1"></span>
-                    <div className="flex-grow">
-                      <span
-                        className="hover:underline cursor-text"
-                        onClick={(ev) => ev.stopPropagation()}
-                      >
-                        {item.name}
-                      </span>
-                    </div>
-                    <span className="fas fa-trash px-1"></span>
-                  </div>
-                ))}
-            </React.Fragment>
-          );
-        })}
+        {isFolderNode(data) &&
+          data.children.map((item) => {
+            return (
+              <NoteEditorSidebarTreeView
+                key={item.id}
+                data={item}
+                renamingID={renamingID}
+                onRenaming={onRenaming}
+              />
+            );
+          })}
       </div>
     </div>
   );
