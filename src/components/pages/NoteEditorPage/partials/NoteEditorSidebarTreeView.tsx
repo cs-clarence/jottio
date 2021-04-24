@@ -101,7 +101,7 @@ function NoteEditorSidebarTreeView({
               }
             }}
           >
-            {data.name}
+            {data.name || <span className="italic opacity-50">unnamed</span>}
             {renamingID === data.id && !rootNode && (
               <input
                 ref={inputRef}

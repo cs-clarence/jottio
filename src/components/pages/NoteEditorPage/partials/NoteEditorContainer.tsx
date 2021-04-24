@@ -32,19 +32,23 @@ function ComponentName(props: Props) {
         <NoteEditorForm
           note={activeFile?.content}
           title={activeFile?.name}
-          onTitleChange={(ev) =>
-            dispatch(
-              fileTreeActions.renameNode({ id: activeFile.id, name: ev })
-            )
-          }
-          onNoteChange={(ev) =>
-            dispatch(
-              fileTreeActions.updateFileContent({
-                id: activeFile.id,
-                content: ev,
-              })
-            )
-          }
+          onTitleChange={(ev) => {
+            if (activeFile) {
+              dispatch(
+                fileTreeActions.renameNode({ id: activeFile.id, name: ev })
+              );
+            }
+          }}
+          onNoteChange={(ev) => {
+            if (activeFile) {
+              dispatch(
+                fileTreeActions.updateFileContent({
+                  id: activeFile.id,
+                  content: ev,
+                })
+              );
+            }
+          }}
         />
 
         <NoteEditorPreview mdText={activeFile?.content} />

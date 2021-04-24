@@ -78,7 +78,7 @@ function NoteEditorTab({ active, onClick, name, id, onClose }: Props) {
       }}
       draggable
     >
-      {name}
+      {name || <span className="italic opacity-50">unnamed</span>}
       <div
         className="fa fa-times pl-2 cursor-pointer"
         onClick={(ev) => {

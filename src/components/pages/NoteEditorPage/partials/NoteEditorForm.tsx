@@ -19,12 +19,14 @@ function NoteEditorForm({
   onFileSave,
 }: Props) {
   const activeID = useAppSelector(selectFileTreeActiveFileID);
+  // console.log(activeID);
 
   return (
     <div className="w-full h-full bg-gray-700 flex flex-col px-3">
       {!!activeID && (
         <>
           <input
+            readOnly={!title}
             id="title"
             type="text"
             className="rounded-2xl bg-gray-600 mt-3 h-10 px-3"
@@ -44,6 +46,7 @@ function NoteEditorForm({
           />
 
           <textarea
+            readOnly={!note}
             id="md-textarea"
             className="rounded-2xl bg-gray-600 my-3 flex-grow p-3 overflow-auto"
             placeholder="Notes..."

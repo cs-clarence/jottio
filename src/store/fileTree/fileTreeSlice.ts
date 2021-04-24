@@ -107,12 +107,21 @@ function findNode(
 function removeNode(
   rootNode: FolderNode,
   predicate: (item: FileNode | Node) => boolean
-): void {
-  for (const [index, node] of rootNode.children.entries()) {
-    if (predicate(node)) {
-      rootNode.children.splice(index, 1);
+): boolean {
+  if (isFolderNode(rootNode)) {
+    for (const [index, node] of rootNode.children.entries()) {
+      if (predicate(node)) {
+        rootNode.children.splice(index, 1);
+        return true;
+      }
+    }
+    for (const node of rootNode.children) {
+      if (isFolderNode(node) && removeNode(node, predicate)) {
+        return true;
+      }
     }
   }
+  return false;
 }
 
 export const fileTreeSlice = createSlice({
@@ -143,6 +152,17 @@ export const fileTreeSlice = createSlice({
       if (state.tree && state.tree.children) {
         removeNode(state.tree, (item) => item.id === action.payload.id);
       }
+      const gotIndex = state.openFileIDs.findIndex(
+        (item) => item === action.payload.id
+      );
+      if (gotIndex > -1) {
+        state.openFileIDs.splice(gotIndex, 1);
+      }
+
+      if (action.payload.id === state.activeFileID) {
+        state.activeFileID = state.openFileIDs[0] ?? "";
+      }
+      // console.log(`deleteNode from openFileIDs ${state.activeFileID}`);
     },
 
     createFile(
