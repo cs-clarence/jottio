@@ -8,7 +8,7 @@ type Props = {
   note?: string;
   onTitleChange?: (title: string) => void;
   onNoteChange?: (note: string) => void;
-  onKeyDown?: (ev: React.KeyboardEvent) => void;
+  onFileSave?: (ev: { title: string | number; content: string }) => void;
 };
 
 function NoteEditorForm({
@@ -16,7 +16,7 @@ function NoteEditorForm({
   onTitleChange,
   note,
   title,
-  onKeyDown,
+  onFileSave,
 }: Props) {
   const activeID = useAppSelector(selectFileTreeActiveFileID);
 
@@ -33,7 +33,14 @@ function NoteEditorForm({
             onChange={(ev) => {
               onTitleChange?.(ev.target.value);
             }}
-            onKeyDown={onKeyDown}
+            onKeyDown={(ev) => {
+              if (ev.ctrlKey && ev.key === "s") {
+                onFileSave?.({ content: note ?? "", title: title ?? "" });
+
+                ev.preventDefault();
+                ev.stopPropagation();
+              }
+            }}
           />
 
           <textarea
@@ -44,7 +51,14 @@ function NoteEditorForm({
             onChange={(ev) => {
               onNoteChange?.(ev.target.value);
             }}
-            onKeyDown={onKeyDown}
+            onKeyDown={(ev) => {
+              if (ev.ctrlKey && ev.key === "s") {
+                onFileSave?.({ content: note ?? "", title: title ?? "" });
+
+                ev.preventDefault();
+                ev.stopPropagation();
+              }
+            }}
           />
         </>
       )}

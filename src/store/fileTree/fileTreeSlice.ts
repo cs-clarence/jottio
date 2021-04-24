@@ -3,8 +3,11 @@ import { RootState } from "..";
 import { v4 as uuid } from "uuid";
 import { fetchCount } from "./fileTreeAPI";
 
-export type Node = {
+type BaseNode = {
   id: string | number;
+};
+
+export type Node = BaseNode & {
   name: string;
 };
 export type FileNode = Node & {
@@ -101,6 +104,17 @@ function findNode(
   return null;
 }
 
+function removeNode(
+  rootNode: FolderNode,
+  predicate: (item: FileNode | Node) => boolean
+): void {
+  for (const [index, node] of rootNode.children.entries()) {
+    if (predicate(node)) {
+      rootNode.children.splice(index, 1);
+    }
+  }
+}
+
 export const fileTreeSlice = createSlice({
   name: "counter",
   initialState,
@@ -125,13 +139,9 @@ export const fileTreeSlice = createSlice({
       }
     },
 
-    deleteNode(state, action: { payload: Node }) {
+    deleteNode(state, action: { payload: BaseNode }) {
       if (state.tree && state.tree.children) {
-        for (const item of state.tree.children) {
-          if (item.id === action.payload.id) {
-            item.name = action.payload.name;
-          }
-        }
+        removeNode(state.tree, (item) => item.id === action.payload.id);
       }
     },
 

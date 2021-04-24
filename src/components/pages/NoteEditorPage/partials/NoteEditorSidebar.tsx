@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "./NoteEditorSidebar.scss";
 import NoteEditorSidebarTreeView from "./NoteEditorSidebarTreeView";
-import { selectFileTree } from "../../../../store";
-import { useAppSelector } from "../../../../store/hooks";
+import { fileTreeActions, selectFileTree } from "../../../../store";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 
 type Props = {};
 
 function NoteEditorSidebar(props: Props) {
   const fileTree = useAppSelector(selectFileTree);
   const [renamingID, setRenamingID] = useState<string | number>("");
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     document.addEventListener("click", () => {
@@ -19,9 +20,21 @@ function NoteEditorSidebar(props: Props) {
   return (
     <div className="bg-gray-800 w-80 h-full border-r-4 border-yellow-300 flex-grow">
       <NoteEditorSidebarTreeView
+        rootNode
         data={fileTree}
         renamingID={renamingID}
         onRenaming={setRenamingID}
+        onFileOpen={(ev) => {
+          dispatch(fileTreeActions.openFile(ev));
+        }}
+        onFileCreate={() => {}}
+        onFolderCreate={() => {}}
+        onNodeDelete={(ev) => {
+          dispatch(fileTreeActions.deleteNode(ev));
+        }}
+        onNodeRename={(ev) => {
+          dispatch(fileTreeActions.renameNode(ev));
+        }}
       />
     </div>
   );

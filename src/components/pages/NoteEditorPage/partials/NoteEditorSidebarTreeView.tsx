@@ -4,25 +4,53 @@ import {
   FolderNode,
   isFileNode,
   isFolderNode,
-  fileTreeActions,
 } from "../../../../store";
-import { useAppDispatch } from "../../../../store/hooks";
 import cn from "classnames";
+
+type ID = number | string;
+type IDPayload = {
+  id: ID;
+};
+type IDAndNamePayload = {
+  id: ID;
+  name: string;
+};
+type NameAndFolderIDPayload = {
+  name: string;
+  inFolderID: ID;
+};
+
+// type IDAndContentPayload = {
+//   id: ID;
+//   content: string;
+// };
 
 export type Props = {
   data: FolderNode | FileNode;
-  renamingID?: string | number;
-  onRenaming?: (id: string | number) => void;
-  onFileOpen?: (ev: FileNode) => void;
-  onFileCreate?: (ev: FileNode) => void;
-  onFolderCreate?: (ev: FolderNode) => void;
+  renamingID?: ID;
+  onRenaming?: (id: ID) => void;
+  onFileOpen?: (ev: IDPayload) => void;
+  onFileCreate?: (ev: NameAndFolderIDPayload) => void;
+  onFolderCreate?: (ev: NameAndFolderIDPayload) => void;
+  onNodeDelete?: (ev: IDPayload) => void;
+  onNodeRename?: (ev: IDAndNamePayload) => void;
+  rootNode?: boolean;
 };
 // create recursive tree
-function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
+function NoteEditorSidebarTreeView({
+  data,
+  renamingID,
+  onRenaming,
+  onNodeDelete,
+  onFileCreate,
+  onFileOpen,
+  onFolderCreate,
+  onNodeRename,
+  rootNode,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState(data.name);
   const inputRef = useRef<HTMLInputElement>(null);
-  const dispatch = useAppDispatch();
 
   useEffect(() => {
     setName(data.name);
@@ -36,11 +64,7 @@ function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
         })}
         onClick={() => {
           if (isFileNode(data)) {
-            dispatch(
-              fileTreeActions.openFile({
-                id: data.id,
-              })
-            );
+            onFileOpen?.({ id: data.id });
           } else {
             setIsOpen((prev) => !prev);
           }
@@ -66,15 +90,19 @@ function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
         )}
         <div className="flex-grow">
           <span
-            className="hover:underline cursor-text relative"
+            className={cn("relative", {
+              "hover:underline cursor-text": !rootNode,
+            })}
             onClick={(ev) => {
-              onRenaming?.(data.id);
-              inputRef.current?.click();
-              ev.stopPropagation();
+              if (!rootNode) {
+                onRenaming?.(data.id);
+                inputRef.current?.click();
+                ev.stopPropagation();
+              }
             }}
           >
             {data.name}
-            {renamingID === data.id && (
+            {renamingID === data.id && !rootNode && (
               <input
                 ref={inputRef}
                 className="text-black absolute w-full h-full left-0 top-0"
@@ -83,7 +111,7 @@ function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
                 onChange={(ev) => setName(ev.target.value)}
                 onKeyDown={(ev) => {
                   if (ev.key === "Enter") {
-                    dispatch(fileTreeActions.renameNode({ id: data.id, name }));
+                    onNodeRename?.({ id: data.id, name: name });
                     onRenaming?.("");
                   }
                 }}
@@ -94,12 +122,32 @@ function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
 
         {!isFileNode(data) && (
           <>
-            <span className="fas fa-folder-plus px-1"></span>
-            <span className="fas fa-file px-1"></span>
+            <span
+              className="fas fa-folder-plus px-1"
+              onClick={(ev) => {
+                onFolderCreate?.({ inFolderID: data.id, name: "" });
+                ev.stopPropagation();
+              }}
+            ></span>
+            <span
+              className="fas fa-file px-1"
+              onClick={(ev) => {
+                onFileCreate?.({ inFolderID: data.id, name: "" });
+                ev.stopPropagation();
+              }}
+            ></span>
           </>
         )}
 
-        <span className="fas fa-trash px-1"></span>
+        {!rootNode && (
+          <span
+            className="fas fa-trash px-1"
+            onClick={(ev) => {
+              onNodeDelete?.({ id: data.id });
+              ev.stopPropagation();
+            }}
+          ></span>
+        )}
       </div>
 
       <div className={cn("pl-4", { hidden: !isOpen })}>
@@ -111,6 +159,11 @@ function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
                 data={item}
                 renamingID={renamingID}
                 onRenaming={onRenaming}
+                onNodeDelete={onNodeDelete}
+                onFileCreate={onFileCreate}
+                onFileOpen={onFileOpen}
+                onFolderCreate={onFolderCreate}
+                onNodeRename={onNodeRename}
               />
             );
           })}

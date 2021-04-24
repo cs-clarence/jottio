@@ -9,7 +9,7 @@ import { fileTreeActions, selectFileTreeActiveFile } from "../../../../store";
 
 type Props = {};
 
-// ! File saving is inefficient at this momemt
+// TODO: Create a more efficient way to save files
 
 function ComponentName(props: Props) {
   const activeFile = useAppSelector(selectFileTreeActiveFile);
@@ -30,8 +30,8 @@ function ComponentName(props: Props) {
         className="split"
       >
         <NoteEditorForm
-          note={activeFile.content}
-          title={activeFile.name}
+          note={activeFile?.content}
+          title={activeFile?.name}
           onTitleChange={(ev) =>
             dispatch(
               fileTreeActions.renameNode({ id: activeFile.id, name: ev })
@@ -45,12 +45,6 @@ function ComponentName(props: Props) {
               })
             )
           }
-          onKeyDown={(ev) => {
-            if (ev.ctrlKey && ev.key === "s") {
-              ev.preventDefault();
-              ev.stopPropagation();
-            }
-          }}
         />
 
         <NoteEditorPreview mdText={activeFile?.content} />
