@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { selectNoteEditorActiveID } from "../../../../store";
 import { useAppSelector } from "../../../../store/hooks";
 import "./NoteEditorForm.scss";
@@ -12,9 +12,7 @@ type Props = {
 
 function NoteEditorForm({ onNoteChange, onTitleChange, note, title }: Props) {
   const activeID = useAppSelector(selectNoteEditorActiveID);
-  useEffect(() => {
-    console.log(activeID);
-  }, [activeID]);
+
   return (
     <div className="w-full h-full bg-gray-700 flex flex-col px-3">
       {!!activeID && (

@@ -43,7 +43,14 @@ function NoteEditorSidebarTreeView({ data, level }: Props) {
           )}
         ></span>
         <span className="fas fa-folder px-1"></span>
-        <div className="flex-grow">{data.name}</div>
+        <div className="flex-grow">
+          <span
+            className="hover:underline cursor-text"
+            onClick={(ev) => ev.stopPropagation()}
+          >
+            {data.name}
+          </span>
+        </div>
         <span className="fas fa-folder-plus px-1"></span>
         <span className="fas fa-file px-1"></span>
         <span className="fas fa-trash px-1"></span>
@@ -53,10 +60,7 @@ function NoteEditorSidebarTreeView({ data, level }: Props) {
           return (
             <React.Fragment key={item.id}>
               {(isTree(item) && (
-                <NoteEditorSidebarTreeView
-                  data={item}
-                  level={level !== undefined ? level + 1 : 1}
-                />
+                <NoteEditorSidebarTreeView data={item} level={level ?? 2} />
               )) ||
                 (isFileNode(item) && (
                   <div
@@ -73,7 +77,14 @@ function NoteEditorSidebarTreeView({ data, level }: Props) {
                   >
                     <span className="fas fa-circle px-1 transform scale-50"></span>
                     <span className="fas fa-file px-1"></span>
-                    <div className="flex-grow">{item.name}</div>
+                    <div className="flex-grow">
+                      <span
+                        className="hover:underline cursor-text"
+                        onClick={(ev) => ev.stopPropagation()}
+                      >
+                        {item.name}
+                      </span>
+                    </div>
                     <span className="fas fa-trash px-1"></span>
                   </div>
                 ))}

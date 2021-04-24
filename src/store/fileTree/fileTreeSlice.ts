@@ -81,6 +81,7 @@ export const fileTreeSlice = createSlice({
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
     editNodeName(state, action: { payload: Node }) {
+      
       if (state.value && state.value.children) {
         for (const item of state.value.children) {
           if (item.id === action.payload.id) {

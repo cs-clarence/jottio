@@ -27,13 +27,26 @@ const noteEditorSlice = createSlice({
       state.activeID = action.payload.id;
     },
     closeFile(state, action: { payload: { id: number | string } }) {
+      // find the index of the element with the id
       const index = state.value.findIndex(
         (item) => item.id === action.payload.id
       );
+
+      // remove the element from the array
       if (index > -1) {
         state.value.splice(index, 1);
       }
-      if (state.value.length <= 0) {
+
+      // if the closed file is the active one, find a new active file
+      if (action.payload.id === state.activeID) {
+        // only if the array isn't empty
+        if (state.value.length > 0) {
+          state.activeID = state.value[index === 0 ? index : index - 1].id;
+        }
+      }
+
+      // if the array is empty, set the active index to nothing
+      if (state.value.length < 1) {
         state.activeID = "";
       }
     },
