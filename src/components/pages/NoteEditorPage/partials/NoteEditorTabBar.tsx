@@ -2,17 +2,17 @@ import React from "react";
 import { useSelector } from "react-redux";
 import NoteEditorTab from "./NoteEditorTab";
 import {
-  selectNoteEditorFiles,
-  selectNoteEditorActiveID,
-  noteEditorActions,
+  selectFileTreeOpenFiles,
+  selectFileTreeActiveFileID,
+  fileTreeActions,
 } from "../../../../store";
 import { useAppDispatch } from "../../../../store/hooks";
 
 type Props = {};
 
 function NoteEditorTabBar(props: Props) {
-  const tabs = useSelector(selectNoteEditorFiles);
-  const activeID = useSelector(selectNoteEditorActiveID);
+  const tabs = useSelector(selectFileTreeOpenFiles);
+  const activeID = useSelector(selectFileTreeActiveFileID);
   const dispatch = useAppDispatch();
   return (
     <div className="h-10 bg-gray-800 w-full flex flex-row select-none">
@@ -23,8 +23,8 @@ function NoteEditorTabBar(props: Props) {
             id={item.id}
             active={activeID === item.id}
             key={item.id}
-            onClick={(ev) => dispatch(noteEditorActions.setActiveID(ev))}
-            onClose={(ev) => dispatch(noteEditorActions.closeFile({ id: ev }))}
+            onClick={(ev) => dispatch(fileTreeActions.setActiveFileID(ev))}
+            onClose={(ev) => dispatch(fileTreeActions.closeFile({ id: ev }))}
           />
         );
       })}

@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FileNode,
   FolderNode,
   isFileNode,
   isFolderNode,
-  noteEditorActions,
   fileTreeActions,
 } from "../../../../store";
 import { useAppDispatch } from "../../../../store/hooks";
@@ -22,6 +21,7 @@ export type Props = {
 function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState(data.name);
+  const inputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -37,10 +37,8 @@ function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
         onClick={() => {
           if (isFileNode(data)) {
             dispatch(
-              noteEditorActions.openFile({
+              fileTreeActions.openFile({
                 id: data.id,
-                content: data.content,
-                name: data.name,
               })
             );
           } else {
@@ -71,12 +69,14 @@ function NoteEditorSidebarTreeView({ data, renamingID, onRenaming }: Props) {
             className="hover:underline cursor-text relative"
             onClick={(ev) => {
               onRenaming?.(data.id);
+              inputRef.current?.click();
               ev.stopPropagation();
             }}
           >
             {data.name}
             {renamingID === data.id && (
               <input
+                ref={inputRef}
                 className="text-black absolute w-full h-full left-0 top-0"
                 type="text"
                 value={name}

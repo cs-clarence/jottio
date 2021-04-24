@@ -5,7 +5,7 @@ import counterReducer, {
 
 describe("counter reducer", () => {
   const initialState: FileTreeState = {
-    value: {
+    tree: {
       id: 0,
       name: "Root",
       children: [
@@ -28,6 +28,8 @@ describe("counter reducer", () => {
       ],
     },
     status: "idle",
+    openFileIDs: [],
+    activeFileID: 0,
   };
   it("should handle initial state", () => {
     expect(counterReducer(undefined, { type: "unknown" })).toEqual({
@@ -41,6 +43,6 @@ describe("counter reducer", () => {
       initialState,
       fileTreeActions.createFile({ inFolder: 0, name: "Folder 20" })
     );
-    expect(actual.value).toEqual(4);
+    expect(actual.tree).toEqual(4);
   });
 });

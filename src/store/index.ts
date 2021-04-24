@@ -1,11 +1,9 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import fileTreeReducer from "./fileTree/fileTreeSlice";
-import noteEditorReducer from "./noteEditor/noteEditorSlice";
 
 export const store = configureStore({
   reducer: {
     fileTree: fileTreeReducer,
-    noteEditor: noteEditorReducer,
   },
 });
 
@@ -19,5 +17,4 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 >;
 // forward exports from fileTreeSlice
 export * from "./fileTree/fileTreeSlice";
-export * from "./noteEditor/noteEditorSlice";
-export { fileTreeReducer, noteEditorReducer };
+export { fileTreeReducer };

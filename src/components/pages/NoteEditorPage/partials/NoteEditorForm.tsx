@@ -1,5 +1,5 @@
 import React from "react";
-import { selectNoteEditorActiveID } from "../../../../store";
+import { selectFileTreeActiveFileID } from "../../../../store";
 import { useAppSelector } from "../../../../store/hooks";
 import "./NoteEditorForm.scss";
 
@@ -8,10 +8,17 @@ type Props = {
   note?: string;
   onTitleChange?: (title: string) => void;
   onNoteChange?: (note: string) => void;
+  onKeyDown?: (ev: React.KeyboardEvent) => void;
 };
 
-function NoteEditorForm({ onNoteChange, onTitleChange, note, title }: Props) {
-  const activeID = useAppSelector(selectNoteEditorActiveID);
+function NoteEditorForm({
+  onNoteChange,
+  onTitleChange,
+  note,
+  title,
+  onKeyDown,
+}: Props) {
+  const activeID = useAppSelector(selectFileTreeActiveFileID);
 
   return (
     <div className="w-full h-full bg-gray-700 flex flex-col px-3">
@@ -26,6 +33,7 @@ function NoteEditorForm({ onNoteChange, onTitleChange, note, title }: Props) {
             onChange={(ev) => {
               onTitleChange?.(ev.target.value);
             }}
+            onKeyDown={onKeyDown}
           />
 
           <textarea
@@ -36,6 +44,7 @@ function NoteEditorForm({ onNoteChange, onTitleChange, note, title }: Props) {
             onChange={(ev) => {
               onNoteChange?.(ev.target.value);
             }}
+            onKeyDown={onKeyDown}
           />
         </>
       )}
