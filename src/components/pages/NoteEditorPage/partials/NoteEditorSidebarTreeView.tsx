@@ -88,7 +88,7 @@ function NoteEditorSidebarTreeView({
             <span className="fas fa-folder px-1"></span>
           </>
         )}
-        <div className="flex-grow">
+        <div className="flex-grow whitespace-nowrap overflow-ellipsis overflow-hidden">
           <span
             className={cn("relative", {
               "hover:underline cursor-text": !rootNode,

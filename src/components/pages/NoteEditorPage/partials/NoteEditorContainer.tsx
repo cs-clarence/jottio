@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import NoteEditorForm from "./NoteEditorForm";
 import NoteEditorPreview from "./NoteEditorPreview";
 import NoteEditorTabBar from "./NoteEditorTabBar";
@@ -14,6 +14,7 @@ type Props = {};
 function ComponentName(props: Props) {
   const activeFile = useAppSelector(selectFileTreeActiveFile);
   const dispatch = useAppDispatch();
+  const [scrollPercent, setScrollPercent] = useState(0);
 
   return (
     <div className="w-full h-full flex flex-col flex-shrink">
@@ -49,9 +50,13 @@ function ComponentName(props: Props) {
               );
             }
           }}
+          onScroll={setScrollPercent}
         />
 
-        <NoteEditorPreview mdText={activeFile?.content} />
+        <NoteEditorPreview
+          mdText={activeFile?.content}
+          scrollPercent={scrollPercent}
+        />
       </Split>
     </div>
   );
