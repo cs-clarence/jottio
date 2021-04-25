@@ -26,7 +26,7 @@ function NoteEditorForm({
       {!!activeID && (
         <>
           <input
-            readOnly={!title}
+            readOnly={title === undefined || title === null}
             id="title"
             type="text"
             className="rounded-2xl bg-gray-600 mt-3 h-10 px-3"
@@ -46,7 +46,7 @@ function NoteEditorForm({
           />
 
           <textarea
-            readOnly={!note}
+            readOnly={note === undefined || note === null}
             id="md-textarea"
             className="rounded-2xl bg-gray-600 my-3 flex-grow p-3 overflow-auto"
             placeholder="Notes..."

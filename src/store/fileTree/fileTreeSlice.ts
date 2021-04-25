@@ -1,7 +1,6 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "..";
 import { v4 as uuid } from "uuid";
-import { fetchCount } from "./fileTreeAPI";
 
 type BaseNode = {
   id: string | number;
@@ -44,24 +43,7 @@ const initialState: FileTreeState = {
   tree: {
     id: uuid(),
     name: "Root",
-    children: [
-      {
-        id: uuid(),
-        name: "Folder 1",
-        children: [
-          { id: uuid(), name: "File 1", content: "# File 1" },
-          { id: uuid(), name: "File 2", content: "# File 2" },
-        ],
-      },
-      {
-        id: uuid(),
-        name: "Folder 2",
-        children: [
-          { id: uuid(), name: "File 3", content: "# File 3" },
-          { id: uuid(), name: "File 4", content: "# File 4" },
-        ],
-      },
-    ],
+    children: [],
   },
   status: "idle",
   openFileIDs: [],
@@ -73,14 +55,14 @@ const initialState: FileTreeState = {
 // will call the thunk with the `dispatch` function as the first argument. Async
 // code can then be executed and other actions can be dispatched. Thunks are
 // typically used to make async requests.
-export const incrementAsync = createAsyncThunk(
-  "fileTree/fetchCount",
-  async (amount: number) => {
-    const response = await fetchCount(amount);
-    // The value we return becomes the `fulfilled` action payload
-    return response.data;
-  }
-);
+// export const incrementAsync = createAsyncThunk(
+//   "fileTree/fetchCount",
+//   async (amount: number) => {
+//     const response = await fetchCount(amount);
+//     // The value we return becomes the `fulfilled` action payload
+//     return response.data;
+//   }
+// );
 
 function findNode(
   tree: FolderNode,
@@ -165,15 +147,62 @@ export const fileTreeSlice = createSlice({
       // console.log(`deleteNode from openFileIDs ${state.activeFileID}`);
     },
 
-    createFile(
-      state,
-      action: { payload: { name: string; inFolder: string | number } }
-    ) {},
+    createFile: {
+      reducer(
+        state,
+        action: {
+          payload: { name: string; inFolder: string | number; id: string };
+        }
+      ) {
+        // console.log("create file");
 
-    createFolder(
-      state,
-      action: { payload: { name: string; inFolder: string | number } }
-    ) {},
+        const got = findNode(
+          state.tree,
+          (item) => item.id === action.payload.inFolder
+        );
+        if (got && isFolderNode(got)) {
+          // console.log("got node for create file");
+
+          got.children.push({ ...action.payload, content: "" });
+        }
+      },
+      prepare(name: string, inFolder: string | number) {
+        return {
+          payload: { name, inFolder, id: uuid() },
+        };
+      },
+    },
+
+    createFolder: {
+      reducer(
+        state,
+        action: {
+          payload: {
+            name: string;
+            inFolder: string | number;
+            id: string | number;
+          };
+        }
+      ) {
+        // console.log("create folder");
+        const got = findNode(
+          state.tree,
+          (item) => item.id === action.payload.inFolder
+        );
+        if (got && isFolderNode(got)) {
+          got.children.push({ ...action.payload, children: [] });
+        }
+      },
+      prepare(name: string, inFolder: string | number) {
+        return {
+          payload: {
+            name,
+            inFolder,
+            id: uuid(),
+          },
+        };
+      },
+    },
 
     setActiveFileID(state, action: { payload: string | number }) {
       state.activeFileID = action.payload;

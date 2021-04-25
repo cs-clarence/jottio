@@ -3,7 +3,7 @@ import {
   FileNode,
   FolderNode,
   isFileNode,
-  isFolderNode,
+  isFolderNode as hasChildren,
 } from "../../../../store";
 import cn from "classnames";
 
@@ -97,6 +97,7 @@ function NoteEditorSidebarTreeView({
               if (!rootNode) {
                 onRenaming?.(data.id);
                 inputRef.current?.click();
+                inputRef.current?.focus();
                 ev.stopPropagation();
               }
             }}
@@ -127,6 +128,7 @@ function NoteEditorSidebarTreeView({
               onClick={(ev) => {
                 onFolderCreate?.({ inFolderID: data.id, name: "" });
                 ev.stopPropagation();
+                setIsOpen(true);
               }}
             ></span>
             <span
@@ -134,6 +136,7 @@ function NoteEditorSidebarTreeView({
               onClick={(ev) => {
                 onFileCreate?.({ inFolderID: data.id, name: "" });
                 ev.stopPropagation();
+                setIsOpen(true);
               }}
             ></span>
           </>
@@ -150,8 +153,12 @@ function NoteEditorSidebarTreeView({
         )}
       </div>
 
-      <div className={cn("pl-4", { hidden: !isOpen })}>
-        {isFolderNode(data) &&
+      <div
+        className={cn("pl-4 transition-all ease-in-out h-0 overflow-hidden", {
+          "h-auto": isOpen,
+        })}
+      >
+        {hasChildren(data) &&
           data.children.map((item) => {
             return (
               <NoteEditorSidebarTreeView

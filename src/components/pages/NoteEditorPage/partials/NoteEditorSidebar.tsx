@@ -27,8 +27,12 @@ function NoteEditorSidebar(props: Props) {
         onFileOpen={(ev) => {
           dispatch(fileTreeActions.openFile(ev));
         }}
-        onFileCreate={() => {}}
-        onFolderCreate={() => {}}
+        onFileCreate={(ev) => {
+          dispatch(fileTreeActions.createFile(ev.name, ev.inFolderID));
+        }}
+        onFolderCreate={(ev) => {
+          dispatch(fileTreeActions.createFolder(ev.name, ev.inFolderID));
+        }}
         onNodeDelete={(ev) => {
           dispatch(fileTreeActions.deleteNode(ev));
         }}
