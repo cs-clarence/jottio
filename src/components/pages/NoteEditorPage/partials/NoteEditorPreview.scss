@@ -985,3 +985,21 @@
   margin: 0 0.2em 0.25em -1.6em;
   vertical-align: middle;
 }
+
+.markdown-body {
+  * {
+    color: white;
+  }
+  th,
+  td,
+  tr,
+  pre,
+  code {
+    @apply bg-gray-700;
+  }
+  ul {
+    & > li {
+      list-style: disc;
+    }
+  }
+}
