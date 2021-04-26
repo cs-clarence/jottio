@@ -18,7 +18,7 @@ function NoteEditorSidebar(props: Props) {
   }, []);
 
   return (
-    <div className="bg-gray-800 w-80 h-full border-r-4 border-yellow-300 flex-grow">
+    <div className="bg-gray-800 w-80 h-full flex-grow">
       <NoteEditorSidebarTreeView
         rootNode
         data={fileTree}

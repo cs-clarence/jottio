@@ -6,6 +6,38 @@ import { useAppSelector } from "../../../../store/hooks";
 // import SimpleMDE from "react-simplemde-editor";
 import "./NoteEditorForm.scss";
 
+function insertAround(
+  str: string,
+  startIndex: number,
+  endIndex: number,
+  insert: string,
+  insertAfter?: string
+) {
+  const newStr = [
+    str.slice(0, startIndex),
+    insert,
+    str.slice(startIndex, endIndex),
+    insertAfter ?? insert,
+    str.slice(endIndex),
+  ].join("");
+  return {
+    newStr,
+    offsetStartIndex: startIndex + insert.length,
+    offsetEndIndex: endIndex + (insertAfter ?? insert).length,
+  };
+}
+
+function insertBefore(str: string, atIndex: number, insertStr: string) {
+  const newStr = [str.slice(0, atIndex), insertStr, str.slice(atIndex)].join(
+    ""
+  );
+
+  return {
+    newStr,
+    offsetIndex: atIndex + insertStr.length,
+  };
+}
+
 type Props = {
   title?: string;
   note?: string;
@@ -15,6 +47,18 @@ type Props = {
   scrollPercent?: number;
   onScroll?: (percent: number) => void;
 };
+
+type HistoryEntity = { str: string; selStart: number; selEnd: number };
+const history: HistoryEntity[] = [];
+
+function pushToHistory(h: HistoryEntity) {
+  if (history.length < 50) {
+    history.push(h);
+  } else {
+    history.unshift();
+    history.push(h);
+  }
+}
 
 function NoteEditorForm({
   onNoteChange,
@@ -60,6 +104,7 @@ function NoteEditorForm({
             ></SimpleMDE>
           </div> */}
           <textarea
+            spellCheck={false}
             readOnly={note === undefined || note === null}
             id="md-textarea"
             className="rounded-2xl bg-gray-600 my-3 flex-grow p-3 overflow-auto"
@@ -69,17 +114,107 @@ function NoteEditorForm({
               onNoteChange?.(ev.target.value);
             }}
             onKeyDown={(ev) => {
-              if (ev.ctrlKey && ev.key === "s") {
-                onFileSave?.({ content: note ?? "", title: title ?? "" });
+              const target = ev.nativeEvent.target as HTMLTextAreaElement;
 
-                ev.preventDefault();
-                ev.stopPropagation();
-              }
-              if (ev.key === "Tab") {
-                onFileSave?.({ content: note ?? "", title: title ?? "" });
+              // tab action
+              if (ev.ctrlKey) {
+                switch (ev.key) {
+                  case "b":
+                    pushToHistory({
+                      str: target.value,
+                      selStart: target.selectionStart,
+                      selEnd: target.selectionEnd,
+                    });
+                    const newValB = insertAround(
+                      target.value,
+                      target.selectionStart,
+                      target.selectionEnd,
+                      "**"
+                    );
+                    target.value = newValB.newStr;
+                    target.setSelectionRange(
+                      newValB.offsetStartIndex,
+                      newValB.offsetEndIndex
+                    );
+                    ev.preventDefault();
+                    break;
+                  case "i":
+                    pushToHistory({
+                      str: target.value,
+                      selStart: target.selectionStart,
+                      selEnd: target.selectionEnd,
+                    });
+                    const newValI = insertAround(
+                      target.value,
+                      target.selectionStart,
+                      target.selectionEnd,
+                      "_"
+                    );
+                    target.value = newValI.newStr;
+                    target.setSelectionRange(
+                      newValI.offsetStartIndex,
+                      newValI.offsetEndIndex
+                    );
+                    ev.preventDefault();
+                    break;
+                  case "x":
+                    pushToHistory({
+                      str: target.value,
+                      selStart: target.selectionStart,
+                      selEnd: target.selectionEnd,
+                    });
+                    const newValSS = insertAround(
+                      target.value,
+                      target.selectionStart,
+                      target.selectionEnd,
+                      "~"
+                    );
+                    target.value = newValSS.newStr;
+                    target.setSelectionRange(
+                      newValSS.offsetStartIndex,
+                      newValSS.offsetEndIndex
+                    );
+                    ev.preventDefault();
+                    break;
+                  case "z":
+                    const got = history.pop();
+                    if (got) {
+                      target.value = got.str;
+                      target.setSelectionRange(got?.selStart, got.selStart);
+                    }
+                    ev.preventDefault();
+                    break;
+                  case "s":
+                    onFileSave?.({ content: note ?? "", title: title ?? "" });
+                    ev.preventDefault();
+                    break;
+                }
+              } else {
+                if (ev.key === "Tab") {
+                  pushToHistory({
+                    str: target.value,
+                    selStart: target.selectionStart,
+                    selEnd: target.selectionEnd,
+                  });
 
-                ev.preventDefault();
-                ev.stopPropagation();
+                  const newVal = insertBefore(
+                    target.value,
+                    target.selectionStart,
+                    "  "
+                  );
+                  target.value = newVal.newStr;
+                  target.setSelectionRange(
+                    newVal.offsetIndex,
+                    newVal.offsetIndex
+                  );
+                  ev.preventDefault();
+                } else {
+                  pushToHistory({
+                    str: target.value,
+                    selStart: target.selectionStart,
+                    selEnd: target.selectionEnd,
+                  });
+                }
               }
             }}
             onScroll={(ev) => {

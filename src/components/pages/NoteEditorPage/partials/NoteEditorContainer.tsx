@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import NoteEditorForm from "./NoteEditorForm";
 import NoteEditorPreview from "./NoteEditorPreview";
 import NoteEditorTabBar from "./NoteEditorTabBar";
@@ -15,6 +15,13 @@ function ComponentName(props: Props) {
   const activeFile = useAppSelector(selectFileTreeActiveFile);
   const dispatch = useAppDispatch();
   const [scrollPercent, setScrollPercent] = useState(0);
+  const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    setContent(activeFile.content);
+    setTitle(activeFile.name);
+  }, [activeFile]);
 
   return (
     <div className="w-full h-full flex flex-col flex-shrink">
@@ -28,35 +35,25 @@ function ComponentName(props: Props) {
         // dragInterval={1}
         direction="horizontal"
         // cursor="col-resize"
-        className="split"
+        className="split-inner"
       >
         <NoteEditorForm
-          note={activeFile?.content}
-          title={activeFile?.name}
-          onTitleChange={(ev) => {
-            if (activeFile) {
-              dispatch(
-                fileTreeActions.renameNode({ id: activeFile.id, name: ev })
-              );
-            }
-          }}
-          onNoteChange={(ev) => {
-            if (activeFile) {
-              dispatch(
-                fileTreeActions.updateFileContent({
-                  id: activeFile.id,
-                  content: ev,
-                })
-              );
-            }
-          }}
+          note={content}
+          title={title}
+          onTitleChange={setTitle}
+          onNoteChange={setContent}
           onScroll={setScrollPercent}
+          onFileSave={(ev) => {
+            dispatch(
+              fileTreeActions.updateFileContent({ content, id: activeFile.id })
+            );
+            dispatch(
+              fileTreeActions.renameNode({ name: title, id: activeFile.id })
+            );
+          }}
         />
 
-        <NoteEditorPreview
-          mdText={activeFile?.content}
-          scrollPercent={scrollPercent}
-        />
+        <NoteEditorPreview mdText={content} scrollPercent={scrollPercent} />
       </Split>
     </div>
   );
