@@ -1,7 +1,7 @@
 import counterReducer, {
   FileTreeState,
   fileTreeActions,
-} from "./fileTreeSlice";
+} from "./fileTableSlice";
 
 describe("counter reducer", () => {
   const initialState: FileTreeState = {

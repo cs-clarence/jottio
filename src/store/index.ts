@@ -1,5 +1,5 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
-import fileTreeReducer from "./fileTree/fileTreeSlice";
+import fileTableReducer from "./fileTable/fileTableSlice";
 
 function saveToLocalStorage(o: object) {
   try {
@@ -23,7 +23,7 @@ function loadFromLocalStorage() {
 
 export const store = configureStore({
   reducer: {
-    fileTree: fileTreeReducer,
+    fileTable: fileTableReducer,
   },
   preloadedState: loadFromLocalStorage(),
 });
@@ -39,5 +39,5 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >;
 // forward exports from fileTreeSlice
-export * from "./fileTree/fileTreeSlice";
-export { fileTreeReducer };
+export * from "./fileTable/fileTableSlice";
+export { fileTableReducer };

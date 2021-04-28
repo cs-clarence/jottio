@@ -19,8 +19,10 @@ function ComponentName(props: Props) {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
-    setContent(activeFile.content);
-    setTitle(activeFile.name);
+    if (activeFile) {
+      setContent(activeFile.content);
+      setTitle(activeFile.name);
+    }
   }, [activeFile]);
 
   return (
@@ -44,12 +46,17 @@ function ComponentName(props: Props) {
           onNoteChange={setContent}
           onScroll={setScrollPercent}
           onFileSave={(ev) => {
-            dispatch(
-              fileTreeActions.updateFileContent({ content, id: activeFile.id })
-            );
-            dispatch(
-              fileTreeActions.renameNode({ name: title, id: activeFile.id })
-            );
+            if (activeFile) {
+              dispatch(
+                fileTreeActions.updateFileContent({
+                  content,
+                  id: activeFile.id,
+                })
+              );
+              dispatch(
+                fileTreeActions.renameNode({ name: title, id: activeFile.id })
+              );
+            }
           }}
         />
 

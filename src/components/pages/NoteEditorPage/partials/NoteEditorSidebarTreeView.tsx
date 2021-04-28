@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  FileNode,
-  FolderNode,
-  isFileNode,
-  isFolderNode as hasChildren,
+  FileEntity,
+  FolderEntity,
+  isFileEntity,
+  selectChildrenOfParent,
 } from "../../../../store";
 import cn from "classnames";
+import { useAppSelector } from "../../../../store/hooks";
 
 type ID = number | string;
 type IDPayload = {
@@ -26,7 +27,7 @@ type NameAndFolderIDPayload = {
 // };
 
 export type Props = {
-  data: FolderNode | FileNode;
+  data: FolderEntity | FileEntity;
   renamingID?: ID;
   onRenaming?: (id: ID) => void;
   onFileOpen?: (ev: IDPayload) => void;
@@ -51,7 +52,11 @@ function NoteEditorSidebarTreeView({
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState(data.name);
   const inputRef = useRef<HTMLInputElement>(null);
+  const children = useAppSelector((state) =>
+    selectChildrenOfParent(state, data.id)
+  );
 
+  // for setting the name after rename of the selected file/folder
   useEffect(() => {
     setName(data.name);
   }, [renamingID, data.name]);
@@ -60,17 +65,17 @@ function NoteEditorSidebarTreeView({
     <div className="select-none cursor-pointer">
       <div
         className={cn("flex items-center px-1", {
-          "bg-white bg-opacity-10 rounded-l-lg": !isFileNode(data),
+          "bg-white bg-opacity-10 rounded-l-lg": !isFileEntity(data),
         })}
         onClick={() => {
-          if (isFileNode(data)) {
+          if (isFileEntity(data)) {
             onFileOpen?.({ id: data.id });
           } else {
             setIsOpen((prev) => !prev);
           }
         }}
       >
-        {(isFileNode(data) && (
+        {(isFileEntity(data) && (
           <>
             <span className="fas fa-circle px-1 transform scale-50"></span>
             <span className="fas fa-file px-1"></span>
@@ -121,7 +126,7 @@ function NoteEditorSidebarTreeView({
           </span>
         </div>
 
-        {!isFileNode(data) && (
+        {!isFileEntity(data) && (
           <>
             <span
               className="fas fa-folder-plus px-1"
@@ -158,8 +163,8 @@ function NoteEditorSidebarTreeView({
           "h-auto": isOpen,
         })}
       >
-        {hasChildren(data) &&
-          data.children.map((item) => {
+        {children &&
+          children.map((item) => {
             return (
               <NoteEditorSidebarTreeView
                 key={item.id}
