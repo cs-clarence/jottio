@@ -4,7 +4,7 @@ import NoteEditorTab from "./NoteEditorTab";
 import {
   selectFileTreeOpenFiles,
   selectFileTreeActiveFileID,
-  fileTreeActions,
+  fileTableActions,
 } from "../../../../store";
 import { useAppDispatch } from "../../../../store/hooks";
 
@@ -23,8 +23,8 @@ function NoteEditorTabBar(props: Props) {
             id={item.id}
             active={activeID === item.id}
             key={item.id}
-            onClick={(ev) => dispatch(fileTreeActions.setActiveFileID(ev))}
-            onClose={(ev) => dispatch(fileTreeActions.closeFile({ id: ev }))}
+            onClick={(ev) => dispatch(fileTableActions.setActiveFileID(ev))}
+            onClose={(ev) => dispatch(fileTableActions.closeFile({ id: ev }))}
           />
         );
       })}

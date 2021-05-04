@@ -5,7 +5,7 @@ import NoteEditorTabBar from "./NoteEditorTabBar";
 import "./NoteEditorContainer.scss";
 import Split from "react-split";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
-import { fileTreeActions, selectFileTreeActiveFile } from "../../../../store";
+import { fileTableActions, selectFileTreeActiveFile } from "../../../../store";
 
 type Props = {};
 
@@ -48,13 +48,13 @@ function ComponentName(props: Props) {
           onFileSave={(ev) => {
             if (activeFile) {
               dispatch(
-                fileTreeActions.updateFileContent({
+                fileTableActions.updateFileContent({
                   content,
                   id: activeFile.id,
                 })
               );
               dispatch(
-                fileTreeActions.renameNode({ name: title, id: activeFile.id })
+                fileTableActions.renameNode({ name: title, id: activeFile.id })
               );
             }
           }}

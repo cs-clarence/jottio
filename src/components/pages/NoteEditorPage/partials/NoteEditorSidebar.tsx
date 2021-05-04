@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./NoteEditorSidebar.scss";
 import NoteEditorSidebarTreeView from "./NoteEditorSidebarTreeView";
-import { fileTreeActions, selectRoot } from "../../../../store";
+import { fileTableActions, selectRoot } from "../../../../store";
 import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
 
 type Props = {};
@@ -26,19 +26,19 @@ function NoteEditorSidebar(props: Props) {
           renamingID={renamingID}
           onRenaming={setRenamingID}
           onFileOpen={(ev) => {
-            dispatch(fileTreeActions.openFile(ev));
+            dispatch(fileTableActions.openFile(ev));
           }}
           onFileCreate={(ev) => {
-            dispatch(fileTreeActions.createFile(ev.name, ev.inFolderID));
+            dispatch(fileTableActions.createFile(ev.name, ev.inFolderID));
           }}
           onFolderCreate={(ev) => {
-            dispatch(fileTreeActions.createFolder(ev.name, ev.inFolderID));
+            dispatch(fileTableActions.createFolder(ev.name, ev.inFolderID));
           }}
           onNodeDelete={(ev) => {
-            dispatch(fileTreeActions.deleteEntity(ev));
+            dispatch(fileTableActions.deleteEntity(ev));
           }}
           onNodeRename={(ev) => {
-            dispatch(fileTreeActions.renameNode(ev));
+            dispatch(fileTableActions.renameNode(ev));
           }}
         />
       )}
